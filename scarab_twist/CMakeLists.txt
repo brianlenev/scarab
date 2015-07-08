@@ -11,3 +11,6 @@ target_link_libraries(joy_to_twist ${catkin_LIBRARIES})
 
 add_executable(key_to_twist src/key_to_twist.cpp)
 target_link_libraries(key_to_twist ${catkin_LIBRARIES} ${CURSES_LIBRARIES})
+
+add_executable(ps3_to_twist src/ps3_to_twist.cpp)
+target_link_libraries(ps3_to_twist ${catkin_LIBRARIES} ${CURSES_LIBRARIES})

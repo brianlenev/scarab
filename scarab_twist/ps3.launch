@@ -1,0 +1,12 @@
+<launch>
+  <node name="joy" pkg="joy" type="joy_node" />
+  <node name="ps3_to_twist" pkg="scarab_twist" type="ps3_to_twist"
+        output="screen" >
+    <param name="max_w_slow" value="1.0" />
+    <param name="max_v_slow" value="0.2" />
+    <param name="max_w_fast" value="1.0" />
+    <param name="max_v_fast" value="1.0" />
+    <remap from="~/twist" to="cmd_vel" />
+    <remap from="~/joy" to="joy" />
+  </node>
+</launch>
