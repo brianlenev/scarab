@@ -3,7 +3,7 @@
 	<!-- Force ROS_NAMESPACE to be used. -->
 	<arg name="ros_ns" default="$(env ROS_NAMESPACE)" />
 	<!-- Set the name of the robot. -->
-	<arg name="robot" default="lane" />
+	<arg name="robot" default="robo0" />
 
 	<group ns="$(arg robot)">
 
@@ -31,20 +31,6 @@
 
 			<param name="initial0" value="0.00 0.00 0.00"/>
 			<param name="$(arg robot)0" value="$(arg ros_ns)/$(arg robot)"/>
-
-			<!-- <remap from="/$(arg robot)/odom_motor" to="$(arg robot)/odom_motor" />
-			<remap from="/$(arg robot)/amcl_pose" to="$(arg robot)/amcl_pose" />
-			<remap from="/$(arg robot)/gt_pose" to="$(arg robot)/gt_pose" />
-			<remap from="/$(arg robot)/gt_odom" to="$(arg robot)/gt_odom" />
-			<remap from="/$(arg robot)/cmd_vel" to="$(arg robot)/cmd_vel" />
-			<remap from="/$(arg robot)/initialpose" to="$(arg robot)/initialpose" /> -->
-
-			<!-- <remap from="/$(arg robot)/odom_motor" to="odom_motor" />
-			<remap from="/$(arg robot)/amcl_pose" to="amcl_pose" />
-			<remap from="/$(arg robot)/gt_pose" to="gt_pose" />
-			<remap from="/$(arg robot)/gt_odom" to="gt_odom" />
-			<remap from="/$(arg robot)/cmd_vel" to="cmd_vel" />
-			<remap from="/$(arg robot)/initialpose" to="initialpose" /> -->
 		</node>
 
 		<node name="laser" pkg="laser_simulator" type="laser_simulator" output="screen" respawn="false">
