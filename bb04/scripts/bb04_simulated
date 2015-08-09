@@ -1,0 +1,287 @@
+#!/usr/bin/env python
+import roslib; roslib.load_manifest('bb04')
+import rospy
+
+import copy
+import random
+
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
+
+
+
+MSG = [
+    {
+        'key': 'mins_left',
+        'value': 9999
+    },
+    {
+        'key': 'active',
+        'value': []
+    },
+    {
+        'key': 'msg',
+        'value': None
+    },
+    {
+        'key': 'id',
+        'value': 1
+    },
+    {
+        'key': 'present',
+        'value': []
+    },
+    {
+        'key': 'charging',
+        'value': []
+    },
+    {
+        'key': 'supplying',
+        'value': []
+    },
+    {
+        'key': 'charge_power',
+        'value': []
+    },
+    {
+        'key': 'power_no_good',
+        'value': []
+    },
+    {
+        'key': 'charge_inhibited',
+        'value': []
+    }
+]
+
+
+BATT_MSG = [
+    {
+        'key': 'At Rate Time To Full (min)',
+        'value': None
+    },
+    {
+        'key': 'Device Name',
+        'value': None
+    },
+    {
+        'key': 'Avg. Time To Empty (min)',
+        'value': None
+    },
+    {
+        'key': 'Max Error (%)',
+        'value': None
+    },
+    {
+        'key': 'Voltage (mV)',
+        'value': 16539
+    },
+    {
+        'key': 'Battery Mode',
+        'value': None
+    },
+    {
+        'key': 'Manufacturer access',
+        'value': None
+    },
+    {
+        'key': 'At Rate (mA)',
+        'value': None
+    },
+    {
+        'key': 'Cycle count (cycle)',
+        'value': None
+    },
+    {
+        'key': 'At Rate OK',
+        'value': None
+    },
+    {
+        'key': 'Remaining Time Alarm (min)',
+        'value': None
+    },
+    {
+        'key': 'Run Time To Empty (min)',
+        'value': None
+    },
+    {
+        'key': 'Manufacture Data',
+        'value': None
+    },
+    {
+        'key': 'Remaining Capacity (mAh)',
+        'value': 6615
+    },
+    {
+        'key': 'At Rate Time To Empty (min)',
+        'value': None
+    },
+    {
+        'key': 'Specification Info',
+        'value': None
+    },
+    {
+        'key': 'Device Chemistry',
+        'value': None
+    },
+    {
+        'key': 'Avg. Time to Full (min)',
+        'value': None
+    },
+    {
+        'key': 'Current (mA)',
+        'value': 0
+    },
+    {
+        'key': 'Status',
+        'value': ['INITIALIZED', 'DISCHARGING', 'FULLY_CHARGED']
+    },
+    {
+        'key': 'Manufacture Name',
+        'value': None
+    },
+    {
+        'key': 'Average Current (mA)',
+        'value': None
+    },
+    {
+        'key': 'Absolute State of Charge (%)',
+        'value': None
+    },
+    {
+        'key': 'Relative State of Charge (%)',
+        'value': 98
+    },
+    {
+        'key': 'Manufacture Date',
+        'value': None
+    },
+    {
+        'key': 'Design Voltage (mV)',
+        'value': None
+    },
+    {
+        'key': 'Serial Number',
+        'value': None
+    },
+    {
+        'key': 'Full Charge Capacity (mAh)',
+        'value': None
+    },
+    {
+        'key': 'Temperature (deg C)',
+        'value': 26.05
+    },
+    {
+        'key': 'Design Capacity (mAh)',
+        'value': None
+    },
+    {
+        'key': 'Remaining Capacity Alarm',
+        'value': None
+    }
+]
+
+
+
+
+def create_message (namespace, num_batteries=2, charging=False, charge=50):
+
+    out = []
+
+    new_msg = copy.deepcopy(MSG)
+
+    batteries = list(range(1, 1+num_batteries))
+
+    # Fill in the batteries that we have
+    new_msg[4]['value'] = batteries;
+    new_msg[7]['value'] = batteries;
+
+    sys_diag = DiagnosticStatus(
+        name = "%sBattery Monitor" % namespace,
+        hardware_id = "%sBB04-%i" % (namespace, 1),
+        message = '',
+        level = DiagnosticStatus.OK)
+    for elem in new_msg:
+        sys_diag.values.append(KeyValue(elem['key'], str(elem['value'])))
+    out.append(sys_diag)
+
+    for i in batteries:
+        new_batt_msg = copy.deepcopy(BATT_MSG)
+
+        states = ['INITIALIZED']
+
+        if charging:
+            states.append('CHARGING')
+        else:
+            states.append('DISCHARGING')
+
+        if charge > 95:
+            states.append('FULLY_CHARGED')
+        elif charge < 5:
+            states.append('FULLY_DISCHARGED')
+
+        new_batt_msg[19]['value'] = states
+
+        new_batt_msg[23]['value'] = charge
+
+
+        batt_diag = DiagnosticStatus(
+                name = "%sBattery %s" % (namespace, i),
+                hardware_id = "%sBattery %s" % (namespace, i),
+                message = '%s%% Charged' % charge,
+                level = DiagnosticStatus.OK)
+        batt_diag.values.extend(KeyValue(elem['key'], str(elem['value'])) for elem in new_batt_msg)
+        out.append(batt_diag)
+
+
+    return out
+
+
+def run():
+    print('publishing made up battery readings')
+
+    random.seed()
+    rospy.init_node('bb04_monitor')
+
+    pub = rospy.Publisher('/diagnostics', DiagnosticArray)
+
+    namespace = rospy.get_namespace()[1:]
+
+    charge = 75
+    charging = False
+
+    while True:
+
+        if charge > 95:
+            charing = False
+
+        elif charge < 10:
+            charging = True
+
+        elif charging:
+            charge += 1
+
+        else:
+            charge -= 1
+
+        # 10 percent change we buck the trend and unplug or plug in
+        flip = random.randint(0, 9)
+        if flip < 10:
+            if charging:
+                charging = False
+            else:
+                charging = True
+
+        msg = create_message(namespace, 2, charging, charge)
+        pub.publish(DiagnosticArray(status = msg))
+
+        rospy.sleep(2)
+
+if __name__ == "__main__":
+    import select
+    try:
+        run()
+    except select.error, e:
+        if e[0] == 4: # interrupted system call
+            pass
+        else:
+            raise
