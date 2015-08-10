@@ -242,7 +242,7 @@ def run():
     random.seed()
     rospy.init_node('bb04_monitor')
 
-    pub = rospy.Publisher('/diagnostics', DiagnosticArray)
+    pub = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=1)
 
     namespace = rospy.get_namespace()[1:]
 
@@ -264,7 +264,7 @@ def run():
             charge -= 1
 
         # 10 percent change we buck the trend and unplug or plug in
-        flip = random.randint(0, 9)
+        flip = random.randint(0, 99)
         if flip < 10:
             if charging:
                 charging = False
