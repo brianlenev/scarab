@@ -24,7 +24,7 @@
 
     <!-- Do the localization inside of the map. -->
     <node pkg="amcl" type="amcl" name="amcl" output="screen">
-      <param name="global_frame_id" value="/map" />
+      <param name="global_frame_id" value="$(arg map_frame)" />
       <param name="base_frame_id" value="$(arg robot)/$(arg base_frame)" />
       <param name="odom_frame_id" value="$(arg robot)/$(arg odom_frame)" />
 
@@ -34,6 +34,8 @@
       <param name="initial_cov_xx" value="0.3" if="$(arg init)" />
       <param name="initial_cov_yy" value="0.3" if="$(arg init)" />
       <param name="initial_cov_aa" value="0.3" if="$(arg init)" />
+
+      <remap from="static_map" to="/$(arg ros_ns)/static_map" />
     </node>
 
     <!-- Convert the output of the AMCL package to the simpler
@@ -79,8 +81,9 @@
       <param name="min_ang" value="-2.2689" />
       <param name="max_ang" value="2.2689" />
       <param name="port" value="/dev/hokuyo" />
-      <param name="frame_id" value="$(arg robot)/laser" />
+      <param name="frame_id" value="/$(arg ros_ns)/$(arg robot)/laser" />
       <remap from="/diagnostics" to="laser_diagnostics" />
+      <!--<remap from="scan" to="$(arg robot)/scan" />-->
     </node>
 
     <!-- Motor controller -->
@@ -91,6 +94,7 @@
     <node name="laser_odom" pkg="laser_odom" type="laser_odom"
           output="screen" >
       <param name="debug" value="true" />
+      <param name="laser_frame" value="$(arg robot)/laser" />
       <param name="base_frame" value="$(arg robot)/$(arg base_frame)" />
       <param name="odom_frame" value="$(arg robot)/$(arg odom_frame)" />
       <param name="decay_duration" value="5" />
@@ -98,6 +102,6 @@
   </group>
 
   <node pkg="tf" type="static_transform_publisher" name="transformer"
-        args="0.0 0.0 0.0 0.0 0.0 0.0 $(arg robot)/base_link $(arg robot)/laser 500" />
+        args="0.0 0.0 0.0 0.0 0.0 0.0 /$(arg ros_ns)/$(arg robot)/base_link /$(arg ros_ns)/$(arg robot)/laser 500" />
 
 </launch>
