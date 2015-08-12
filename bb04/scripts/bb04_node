@@ -191,7 +191,10 @@ class Battery(object):
                 rospy.logdebug("Battery.update(): Unhandled code '%s'" % code)
                 continue
             key, converter = Battery.CONVERSIONS[code]
-            self._attrs[key] = converter(val)
+            try:
+                self._attrs[key] = converter(val)
+            except Exception:
+                self._attrs[key] = '--'
 
     def attrs(self):
         return dict(self._attrs)
