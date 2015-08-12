@@ -9,7 +9,8 @@ import geometry_msgs.msg
 class Stripper(object):
     def __init__(self):
         self._pub = rospy.Publisher("pose_stamped",
-                                    geometry_msgs.msg.PoseStamped)
+                                    geometry_msgs.msg.PoseStamped,
+                                    latch=True)
         self._pose_sub = \
             rospy.Subscriber("amcl_pose",
                              geometry_msgs.msg.PoseWithCovarianceStamped,
