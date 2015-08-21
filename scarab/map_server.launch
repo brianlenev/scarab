@@ -1,8 +1,9 @@
 <launch>
 	<group ns="scarab" >
 		<arg name="map_frame" default="map_hokuyo" />
+		<arg name="map_file" default="bbb4_2015-07-09.2.yaml" />
 
-		<node name="map" pkg="map_server" type="map_server" output="screen" args="$(find scarab)/maps/bbb4_2015-07-09.2.yaml" >
+		<node name="map" pkg="map_server" type="map_server" output="screen" args="$(find scarab)/maps/$(arg map_file)" >
 			<param name="frame_id" value="$(arg map_frame)" />
 		</node>
 
