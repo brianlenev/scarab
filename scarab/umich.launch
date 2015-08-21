@@ -94,9 +94,10 @@
       <param name="odom_frame" value="$(arg robot)/odom_laser" />
       <param name="decay_duration" value="5" />
     </node>
-  </group>
 
-  <node pkg="tf" type="static_transform_publisher" name="transformer"
-        args="0.0 0.0 0.0 0.0 0.0 0.0 $(arg robot)/base_link $(arg robot)/laser 500" />
+    <node pkg="tf" type="static_transform_publisher" name="transformer"
+          args="0.0 0.0 0.0 0.0 0.0 0.0 $(arg robot)/base_link $(arg robot)/laser 500" />
+
+  </group>
 
 </launch>
