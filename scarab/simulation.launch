@@ -78,7 +78,7 @@
 			<param name="stuck_start" value="3.0" />
 			<remap from="odom" to="$(arg odom_frame)" />
 			<remap from="map" to="$(arg map)" />
-			<param name="stop_on_preempt" value="false" />
+			<param name="stop_on_preempt" value="true" />
 			<remap from="cmd_vel" to="cmd_vel" />
 		</node>
 
