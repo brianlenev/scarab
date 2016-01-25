@@ -4,7 +4,7 @@
 
   <group ns="$(env ROS_NAMESPACE)" >
     <node name="map_server" pkg="map_server" type="map_server" output="screen"
-          args="$(find scarab)/maps/levine-4.yaml">
+          args="$(find scarab)/maps/dop.yaml">
       <param name="frame_id" value="/map" />
     </node>
 

@@ -10,13 +10,26 @@
 
   <group ns="$(arg robot)">
 
-    <arg name="map" default="/$(arg ros_ns)/map" />
+    <arg name="map" default="/$(arg ros_ns)/$(arg robot)/map" />
     <arg name="map_frame" default="map_hokuyo" />
+
+    <node name="tf_throttle" pkg="tf_throttle" type="tf_throttle" output="screen" args="/$(arg ros_ns)/$(arg robot)/tf 5 /tf">
+     <param name="republish_time" value="0.0" />
+     <param name="use_diff" value="false" />
+     <param name="angular_change_threshold" value="0.1" />
+     <param name="linear_change_threshold" value="0.3" />
+</node>
+<param name="tf_prefix" value="/$(arg ros_ns)/$(arg robot)" />
+<remap from="/tf" to="tf"/>
 
     <!-- Publish periodic battery information, including the current
          battery charge percentage. -->
     <node name="battery" pkg="bb04" type="bb04_node">
       <remap from="/diagnostics" to="diagnostics" />
+    </node>
+
+    <node name="map" pkg="map_server" type="map_server" output="screen" args="$(find scarab)/maps/$(arg map_file)" >
+      <param name="frame_id" value="$(arg map_frame)" />
     </node>
 
     <!-- Do the localization inside of the map. -->
@@ -25,14 +38,14 @@
       <param name="base_frame_id" value="$(arg robot)/base_link" />
       <param name="odom_frame_id" value="$(arg robot)/odom_laser" />
 
-      <param name="initial_pose_x" value="0.0" if="$(arg init)" />
-      <param name="initial_pose_y" value="0.0" if="$(arg init)" />
-      <param name="initial_pose_a" value="0.0" if="$(arg init)" />
+      <param name="initial_pose_x" value="2.2" if="$(arg init)" />
+      <param name="initial_pose_y" value="2.2" if="$(arg init)" />
+      <param name="initial_pose_a" value="1.57" if="$(arg init)" />
       <param name="initial_cov_xx" value="0.3" if="$(arg init)" />
       <param name="initial_cov_yy" value="0.3" if="$(arg init)" />
       <param name="initial_cov_aa" value="0.3" if="$(arg init)" />
 
-      <remap from="static_map" to="/$(arg ros_ns)/static_map" />
+      <remap from="static_map" to="/$(arg ros_ns)/$(arg robot)/static_map" />
     </node>
 
     <!-- Convert the output of the AMCL package to the simpler

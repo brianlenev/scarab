@@ -4,6 +4,7 @@ import roslib; roslib.load_manifest('hfn')
 import rospy
 import actionlib
 
+from std_msgs.msg import Empty
 from scarab_msgs.msg import MoveAction, MoveGoal
 from scarab_msgs.msg import ScarabState
 from geometry_msgs.msg import PoseStamped
@@ -33,6 +34,7 @@ class GoalToAction ():
         self.state_pub = rospy.Publisher('state', ScarabState, latch=True, queue_size=1)
 
         rospy.Subscriber("goal", PoseStamped, self.callback)
+        rospy.Subscriber("cancel", Empty, self.cancel_callback)
         rospy.spin()
 
 
@@ -56,7 +58,7 @@ class GoalToAction ():
 
         goal.target_poses.append(data)
         self.client.send_goal(goal)
-
+	'''
         while True:
             scarab_state = ScarabState()
             ret = self.client.wait_for_result(rospy.Duration.from_sec(1.0))
@@ -83,6 +85,10 @@ class GoalToAction ():
                 # Goal not finished, still waiting
                 scarab_state.state = 'BUSY'
                 self.state_pub.publish(scarab_state)
+	'''
+
+    def cancel_callback (self, data):
+        self.client.cancel_goal()
 
 if __name__ == '__main__':
     gta = GoalToAction()

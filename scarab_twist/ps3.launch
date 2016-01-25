@@ -1,5 +1,4 @@
 <launch>
-  <group ns="$(env ROS_NAMESPACE)" >
     <node name="joy" pkg="joy" type="joy_node" />
     <node name="ps3_to_twist" pkg="scarab_twist" type="ps3_to_twist"
         output="screen" >
@@ -10,5 +9,4 @@
       <remap from="~/twist" to="cmd_vel" />
       <remap from="~/joy" to="joy" />
     </node>
-  </group>
 </launch>
